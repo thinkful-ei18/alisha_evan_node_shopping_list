@@ -28,6 +28,7 @@ ShoppingList.create('tomatoes', 3);
 ShoppingList.create('peppers', 4);
 
 Recipes.create('chocolate milk', ['cocoa', 'milk', 'sugar']);
+Recipes.create('Pasta Soup', ['beans', 'pasta', 'soup']);
 
 // when the root of this route is called with GET, return
 // all current ShoppingList items by calling `ShoppingList.get()`
@@ -77,6 +78,22 @@ app.post('/recipes', (req,res) => {
   const item = Recipes.create(req.body.name,req.body.ingredients);
   res.status(201).json(item);
 });
+
+
+// DELETE ROUTES
+
+app.delete('/shopping-list/:id', (req, res) => {
+  ShoppingList.delete(req.params.id);
+  console.log(`Deleted shopping list item \`${req.params.id}\``);
+  res.status(204).end();
+});
+
+app.delete('/recipes/:id', (req, res) => {
+  Recipes.delete(req.params.id);
+  console.log( `Deleted recipe item ${req.params.id}`);
+  res.status(204).end();
+});
+
 
 
 
