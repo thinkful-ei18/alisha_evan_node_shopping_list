@@ -12,12 +12,12 @@ const bodyParser = require('body-parser');
 const {ShoppingList} = require('./models');
 const {Recipes} = require('./models');
 
-const jsonParser = bodyParser.json();
+// const jsonParser = bodyParser.json();
 const app = express();
 
 // log the http layer
 app.use(morgan('common'));
-
+app.use(express.json());
 // we're going to add some items to ShoppingList
 // so there's some data to look at. Note that 
 // normally you wouldn't do this. Usually your
@@ -31,6 +31,9 @@ Recipes.create('chocolate milk', ['cocoa', 'milk', 'sugar']);
 
 // when the root of this route is called with GET, return
 // all current ShoppingList items by calling `ShoppingList.get()`
+
+
+// GET ROUTES
 app.get('/shopping-list', (req, res) => {
   res.json(ShoppingList.get());
 });
@@ -38,6 +41,45 @@ app.get('/shopping-list', (req, res) => {
 app.get('/recipes', (req, res) => {
   res.json(Recipes.get());
 });
+
+
+
+// POST ROUTES
+
+app.post('/shopping-list', (req, res) => {
+  // ensure `name` and `budget` are in request body
+  const requiredFields = ['name', 'budget'];
+  for (let i=0; i<requiredFields.length; i++) {
+    const field = requiredFields[i];
+    if (!(field in req.body)) {
+      const message = `Missing \`${field}\` in request body`
+      console.error(message);
+      return res.status(400).send(message);
+    }
+  }
+
+
+  const item = ShoppingList.create(req.body.name, req.body.budget);
+  res.status(201).json(item);
+});
+
+
+app.post('/recipes', (req,res) => {
+  const requiredFields = ['name','ingredients'];
+  requiredFields.forEach((field) => {
+    if (!(field in req.body)) {
+      const message = `Missing ${field} in request body`;
+      console.error(message);
+      return res.status(400).send(message);
+    }
+  });
+
+  const item = Recipes.create(req.body.name,req.body.ingredients);
+  res.status(201).json(item);
+});
+
+
+
 
 app.listen(process.env.PORT || 8080, () => {
   console.log(`Your app is listening on port ${process.env.PORT || 8080}`);
